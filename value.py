@@ -16,6 +16,44 @@ value.append(sub02_values)
 value.append(sub03_values)
 value.append(sub04_values)
 
+def get_summary(url):
+    url2=urlopen(url)
+    soup= BeautifulSoup(url2,"html.parser")
+
+    links=[]
+
+    base_url="http://my.knu.ac.kr/"
+    tds=soup.find_all("td",{"class" : "th4"})
+    for td in tds :
+        link1=td.find("a")
+        links.append(link1["href"])
+
+
+
+    summary =[]
+
+    for link in links :
+        newlink=base_url+link;
+        url2=urlopen(str(newlink))
+        soup2= BeautifulSoup(url2,"html.parser")
+
+        course=[]
+
+        table=soup2.find("table",{"id" : "form2"})
+        trs=table.find_all("tr");
+        i=1
+        for tr in trs :
+            course.append(tr.find("th").string)
+            course.append(tr.find("td").string)
+            i=i+1
+            if i==13 :
+                break
+
+        summary.append(course)
+
+    return summary
+
+
 main_url= urlopen("http://my.knu.ac.kr/stpo/stpo/cour/listLectPln/list.action");
 soup= BeautifulSoup(main_url,"html.parser")
 
@@ -62,17 +100,22 @@ while i<=3:
 
     value[i]=total
     i=i+1
-
-print(value[0])
-print("-----------------------------")
-print(value[1])
-print("-----------------------------")
-print(value[2])
-print("-----------------------------")
-print(value[3])
-print("-----------------------------")
-
     
+total_summary=[];
+
+url1="http://my.knu.ac.kr/stpo/stpo/cour/listLectPln/list.action?search_open_crse_cde="
+url2="&sub="
+url3="&search_open_yr_trm=20172"
+for code in value[1] :
+    for dept in code[1] :
+        newurl=url1+str(dept)+url2+str(code[0])+url3
+        temp=get_summary(newurl)
+        print(temp)
+        total_summary.append(temp)
+
+print(total_summary)
+        
+                
 
 
 
